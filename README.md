@@ -23,7 +23,7 @@ For development, use:
 ```bash
 mix run mix run -e Testrunner.Cli.main -- --suites <test-suite-paths>
 ```
-[.gitignore](..%2Ffeature-matrix%2F.gitignore)
+
 The test suite paths should be relative to the current working directory. Multiple test suites can be separated by a
 comma.
 
