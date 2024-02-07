@@ -32,6 +32,7 @@ defmodule Testrunner.MixProject do
   defp escript do
     [
       main_module: Testrunner.Cli,
+      path: "out/testrunner",
     ]
   end
 end
