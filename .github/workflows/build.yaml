@@ -1,4 +1,4 @@
-name: Build testrunner
+name: Build and demo testrunner
 
 on:
   push:
@@ -22,3 +22,6 @@ jobs:
         run: mix compile
       - name: Build escript executable
         run: MIX_ENV=prod mix escript.build
+
+      - name: Execute Runner on test data
+        run: out/testrunner -s test-src
