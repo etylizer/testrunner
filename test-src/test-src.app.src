@@ -1,3 +1,0 @@
-{application, testsrc,
-  [{description, "test src"}, {vsn, "inplace"}, {applications, [kernel, stdlib]}]
-}.

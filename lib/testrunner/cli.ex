@@ -21,12 +21,22 @@ defmodule Testrunner.Cli do
 
     test_data = TestCollector.collect_tests(test_suites, test_categories)
 
-    executables = [
-      {:dialyzer, "dialyzer"},
-      {:etylizer, "./ety"},
-      {:gradualizer, "./gradualizer"},
-      {:eqwalizer, "./elp"}
-    ]
+    run_eqwalizer = File.exists?("elp") && File.exists?("project.json")
+    executables = if run_eqwalizer do
+      [
+        {:dialyzer, "dialyzer"},
+        {:etylizer, "./ety"},
+        {:gradualizer, "./gradualizer"},
+        {:eqwalizer, "./elp"}
+      ]
+    else
+      IO.puts("Eqwalizer executable or project.json not found. Skipping eqwalizer execution")
+      [
+        {:dialyzer, "dialyzer"},
+        {:etylizer, "./ety"},
+        {:gradualizer, "./gradualizer"}
+      ]
+    end
 
     test_results = Enum.map(executables, fn executable = {exec_type, _} ->
       IO.inspect({:executable, exec_type})

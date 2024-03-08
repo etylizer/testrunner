@@ -56,6 +56,27 @@ Valid expected results are:
 
 Any other expected result will be mapped to `unknown`.
 
+In order to run eqwalizer, an additional `project.json` file in the root working directory is needed.
+The structure of this file is described in the [eqwalizer documentation](https://github.com/WhatsApp/eqwalizer/?tab=readme-ov-file#using-it-with-non-rebar-projects)
+
+For the feature-matrix project, this file might have the following structure:
+```json
+{
+  "apps": [
+    {
+      "name": "ety-test",
+      "dir": ".",
+      "src_dirs": ["ety-src"]
+    },
+    {
+      "name": "gradualizer-test",
+      "dir": ".",
+      "src_dirs": ["gradualizer-src"]
+    }
+  ]
+}
+```
+
 ### Command line options
 
 There are multiple command line options to customize the behaviour of the test runner:
