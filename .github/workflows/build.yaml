@@ -23,5 +23,8 @@ jobs:
       - name: Build escript executable
         run: MIX_ENV=prod mix escript.build
 
+      - name: Verify that elp works
+        run: ./elp eqwalize-all --project project.json
+
       - name: Execute Runner on test data
         run: out/testrunner -s test-src
