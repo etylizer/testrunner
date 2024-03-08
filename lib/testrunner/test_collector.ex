@@ -23,6 +23,7 @@ defmodule TestCollector do
         files: test_files,
       }
     end)
+      |> Enum.filter(fn %{files: test_files} -> !Enum.empty?(test_files) end)
       |> Enum.filter(fn %{category: category_name} -> Enum.empty?(categories) || Enum.member?(categories, category_name) end)
   end
 end

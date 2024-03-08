@@ -1,0 +1,9 @@
+{
+  "apps": [
+    {
+      "name": "test_src",
+      "dir": ".",
+      "src_dirs": ["test-src"]
+    }
+  ]
+}

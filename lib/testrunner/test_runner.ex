@@ -57,23 +57,24 @@ defmodule TestRunner do
   defp run_test(executable, expected_result, test_file, timeout_executable) do
     args = build_args(executable, test_file)
     start_time = :os.system_time(:millisecond)
-    {_output, exit_code} = System.cmd(timeout_executable, ["-t", "10", "-s", "6000000" | args], stderr_to_stdout: true)
+    {output, exit_code} = System.cmd(timeout_executable, ["-t", "10", "-s", "6000000" | args], stderr_to_stdout: true)
     end_time = :os.system_time(:millisecond)
     time_diff = end_time - start_time
-    Map.put(evaluate_result(exit_code, expected_result, executable), :time_diff, time_diff)
+    Map.put(evaluate_result(exit_code, output, expected_result, executable), :time_diff, time_diff)
   end
 
   @spec build_args({atom(), String.t()}, String.t()) :: [String.t()]
   defp build_args({type, path}, test_file) do
     case type do
       :dialyzer -> [path, "--src", test_file]
+      :eqwalizer -> [path, "eqwalize", Path.basename(test_file, ".erl"), "--project", "project.json"]
       _ -> [path, test_file]
     end
   end
 
-  @spec evaluate_result(integer(), atom(), {atom(), String.t()}) :: %{raw_result: test_result(), result: test_result()}
-  defp evaluate_result(exit_code, expected_result, executable) do
-    raw_result = evaluate_raw_result(exit_code, executable)
+  @spec evaluate_result(integer(), String.t(), atom(), {atom(), String.t()}) :: %{raw_result: test_result(), result: test_result()}
+  defp evaluate_result(exit_code, console_output, expected_result, executable) do
+    raw_result = evaluate_raw_result(exit_code, console_output, executable)
 
     result = case raw_result do
       :pass when expected_result == :pass -> :pass
@@ -88,14 +89,17 @@ defmodule TestRunner do
     %{raw_result: raw_result, result: result}
   end
 
-  @spec evaluate_raw_result(integer(), {atom(), String.t()}) :: test_result()
-  defp evaluate_raw_result(exit_code, {executable_type, _}) do
-    effective_exit_code =
-      case exit_code do
-        1 when executable_type == :dialyzer -> 2
-        2 when executable_type == :dialyzer -> 1
-        _ -> exit_code
-      end
+  @spec evaluate_raw_result(integer(), String.t(), {atom(), String.t()}) :: test_result()
+  defp evaluate_raw_result(exit_code, console_output, {executable_type, _}) do
+    effective_exit_code = case executable_type do
+      :dialyzer -> case exit_code do
+                     1 -> 2
+                     2 -> 1
+                     _ -> exit_code
+                   end
+      :eqwalizer when exit_code == 0 -> process_output(console_output)
+      _ -> exit_code
+    end
 
     case effective_exit_code do
       0 -> :pass
@@ -105,6 +109,16 @@ defmodule TestRunner do
       124 -> :timeout
       137 -> :crash_memory
       _ -> :unknown
+    end
+  end
+
+  @spec process_output(String.t()) :: integer()
+  defp process_output(console_output) do
+    case Regex.run(~r/((\d+)\s+ERRORS?)|(NO ERRORS)/, console_output) do
+      nil -> 2
+      [_, "", "", "NO ERRORS"] -> 0
+      [_, _, _, ""] -> 1
+      _ -> 2
     end
   end
 end
