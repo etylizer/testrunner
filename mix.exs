@@ -1,4 +1,4 @@
-defmodule Testrunner.MixProject do
+defmodule TestRunner.MixProject do
   use Mix.Project
 
   def project do
@@ -8,6 +8,7 @@ defmodule Testrunner.MixProject do
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      dialyzer: [flags: ["-Wunmatched_returns", :error_handling, :underspecs]],
       escript: escript(),
     ]
   end
@@ -22,6 +23,7 @@ defmodule Testrunner.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:jason, "~> 1.4"},
       {:flow, "~> 1.2"},
       # {:dep_from_hexpm, "~> 0.3.0"},
@@ -31,7 +33,7 @@ defmodule Testrunner.MixProject do
 
   defp escript do
     [
-      main_module: Testrunner.Cli,
+      main_module: TestRunner.Cli,
       path: "out/testrunner",
     ]
   end

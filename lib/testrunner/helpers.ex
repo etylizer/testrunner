@@ -1,4 +1,4 @@
-defmodule Helpers do
+defmodule TestRunner.Helpers do
   @spec get_category(String.t) :: atom()
   def get_category(category_string) do
     case category_string do

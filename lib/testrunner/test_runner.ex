@@ -1,42 +1,55 @@
-defmodule TestRunner do
+defmodule TestRunner.Runner do
+
   @type test_result() :: :pass | :fail | :not_implemented | :timeout | :crash_memory | :unknown
-  @type file_result() :: %{file: String.t(), result: test_result(), raw_result: test_result(), expected_result: test_result(), time: integer()}
-  @type category_result() :: %{category: String.t(), actual_time: integer(), total_time: integer(), results: [file_result()]}
+
+  @type file_result() :: %{
+                           file: String.t(),
+                           result: test_result(),
+                           raw_result: test_result(),
+                           expected_result: test_result(),
+                           time: integer()
+                         }
+
+  @type category_result() :: %{
+                               category: String.t(),
+                               actual_time: integer(),
+                               total_time: integer(),
+                               results: [file_result()]
+                             }
+
   @type suite_result() :: %{test_suite: String.t(), categories: [category_result()]}
 
-  @spec run_tests({atom(), String.t()}, [TestCollector.test_suite()], boolean(), String.t()) :: [suite_result()]
-  def run_tests(executable, tests, disable_parallelism, timeout_executable) do
+  @spec run_tests({atom(), String.t()}, [TestRunner.TestCollector.test_suite()], TestRunner.TestConfig.t()) :: [suite_result()]
+  def run_tests(executable, tests, options) do
     Enum.map(tests, fn test_suite = %{suite: suite_name} ->
-      %{test_suite: suite_name, categories: run_suite_tests(executable, test_suite, disable_parallelism, timeout_executable)}
+      %{test_suite: suite_name, categories: run_suite_tests(executable, test_suite, options)}
     end)
-#    |> Map.new(fn %{test_suite: test_suite, results: results} -> {test_suite, results} end)
   end
 
-  @spec run_suite_tests({atom(), String.t()}, TestCollector.test_suite(), boolean(), String.t()) :: [category_result()]
-  defp run_suite_tests(executable, %{suite: suite_name, test_categories: test_categories}, disable_parallelism, timeout_executable) do
+  @spec run_suite_tests({atom(), String.t()}, TestRunner.TestCollector.test_suite(), TestRunner.TestConfig.t()) :: [category_result()]
+  defp run_suite_tests(executable, %{suite: suite_name, test_categories: test_categories}, options) do
     IO.inspect({:suite, suite_name})
 
     Enum.map(test_categories, fn test_category ->
-      run_category_tests(executable, test_category, disable_parallelism, timeout_executable)
+      run_category_tests(executable, test_category, options)
     end)
-#    |> Map.new(fn %{category: category, results: results} -> {category, results} end)
   end
 
-  @spec run_category_tests({atom(), String.t()}, TestCollector.test_category(), boolean(), String.t()) :: category_result()
+  @spec run_category_tests({atom(), String.t()}, TestRunner.TestCollector.test_category(), TestRunner.TestConfig.t()) :: category_result()
   defp run_category_tests(executable, %{
          category: category_name,
          expected_result: expected_result,
          files: files
-       }, disable_parallelism, timeout_executable) do
+       }, options = %TestRunner.TestConfig{disable_parallelism: disable_parallelism}) do
     IO.inspect({:category, category_name})
 
     category_start_time = :os.system_time(:millisecond)
     results = case disable_parallelism do
       true ->
-        Enum.map(files, fn test_file -> process_test_file(test_file, executable, expected_result, timeout_executable) end)
+        Enum.map(files, fn test_file -> process_test_file(test_file, executable, expected_result, options) end)
       false ->
         Flow.from_enumerable(files, min_demand: 1, max_demand: 2)
-        |> Flow.map(fn test_file -> process_test_file(test_file, executable, expected_result, timeout_executable) end)
+        |> Flow.map(fn test_file -> process_test_file(test_file, executable, expected_result, options) end)
         |> Enum.to_list()
     end
 
@@ -46,29 +59,37 @@ defmodule TestRunner do
     %{category: category_name, results: results, actual_time: actual_time, total_time: total_time}
   end
 
-  @spec process_test_file(String.t(), {atom(), String.t()}, atom(), String.t()) :: file_result()
-  defp process_test_file(test_file, executable, expected_result, timeout_executable) do
-    %{raw_result: raw_result, result: test_result, time_diff: time_diff} = run_test(executable, expected_result, test_file, timeout_executable)
+  @spec process_test_file(String.t(), {atom(), String.t()}, atom(), TestRunner.TestConfig.t()) :: file_result()
+  defp process_test_file(test_file, executable, expected_result, options) do
+    %{raw_result: raw_result, result: test_result, time_diff: time_diff} = run_test(executable, expected_result, test_file, options)
     IO.inspect({test_file, test_result})
     %{file: test_file, time: time_diff, result: test_result, raw_result: raw_result, expected_result: expected_result}
   end
 
-  @spec run_test({atom(), String.t()}, atom(), String.t(), String.t()) :: %{raw_result: test_result(), result: test_result(), time_diff: integer()}
-  defp run_test(executable, expected_result, test_file, timeout_executable) do
-    args = build_args(executable, test_file)
+  @spec run_test({atom(), String.t()}, atom(), String.t(), TestRunner.TestConfig.t()) :: %{raw_result: test_result(), result: test_result(), time_diff: integer()}
+  defp run_test(executable, expected_result, test_file, options) do
     start_time = :os.system_time(:millisecond)
-    {output, exit_code} = System.cmd(timeout_executable, ["-t", "10", "-s", "6000000" | args], stderr_to_stdout: true)
+    {output, exit_code} = construct_execution(executable, test_file).(options.timeout_executable, options.ety_dir)
+    if options.debug_mode do
+      IO.inspect(output)
+    end
     end_time = :os.system_time(:millisecond)
     time_diff = end_time - start_time
     Map.put(evaluate_result(exit_code, output, expected_result, executable), :time_diff, time_diff)
   end
 
-  @spec build_args({atom(), String.t()}, String.t()) :: [String.t()]
-  defp build_args({type, path}, test_file) do
-    case type do
+  @spec construct_execution({atom(), String.t()}, String.t()) :: (String.t, String.t -> {String.t(), non_neg_integer()})
+  defp construct_execution({type, path}, test_file) do
+    args = case type do
       :dialyzer -> [path, "--src", test_file]
       :eqwalizer -> [path, "eqwalize", Path.basename(test_file, ".erl"), "--project", "project.json"]
+      :etylizer -> [path, Path.absname(test_file)]
       _ -> [path, test_file]
+    end
+
+    case type do
+      :etylizer -> fn timeout_executable, ety_dir -> System.cmd(timeout_executable, ["-t", "10", "-s", "6000000" | args], stderr_to_stdout: true, cd: ety_dir) end
+      _ -> fn timeout_executable, _ety_dir -> System.cmd(timeout_executable, ["-t", "10", "-s", "6000000" | args], stderr_to_stdout: true) end
     end
   end
 
@@ -89,7 +110,7 @@ defmodule TestRunner do
     %{raw_result: raw_result, result: result}
   end
 
-  @spec evaluate_raw_result(integer(), String.t(), {atom(), String.t()}) :: test_result()
+  @spec evaluate_raw_result(non_neg_integer(), String.t(), {atom(), String.t()}) :: test_result()
   defp evaluate_raw_result(exit_code, console_output, {executable_type, _}) do
     effective_exit_code = case executable_type do
       :dialyzer -> case exit_code do
@@ -112,7 +133,7 @@ defmodule TestRunner do
     end
   end
 
-  @spec process_output(String.t()) :: integer()
+  @spec process_output(String.t()) :: 0 | 1 | 2
   defp process_output(console_output) do
     case Regex.run(~r/((\d+)\s+ERRORS?)|(NO ERRORS)/, console_output) do
       nil -> 2

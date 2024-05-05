@@ -1,4 +1,4 @@
-# Testrunner
+# TestRunner
 
 An elixir application used to run various erlang type checkers on a set of tests.
 
@@ -21,7 +21,7 @@ mix escript.build
 For development, use:
 
 ```bash
-mix run mix run -e Testrunner.Cli.main -- --suites <test-suite-paths>
+mix run mix run -e TestRunner.Cli.main -- -s <test-suite-paths>
 ```
 
 The test suite paths should be relative to the current working directory. Multiple test suites can be separated by a
@@ -57,21 +57,27 @@ Valid expected results are:
 Any other expected result will be mapped to `unknown`.
 
 In order to run eqwalizer, an additional `project.json` file in the root working directory is needed.
-The structure of this file is described in the [eqwalizer documentation](https://github.com/WhatsApp/eqwalizer/?tab=readme-ov-file#using-it-with-non-rebar-projects)
+The structure of this file is described in
+the [eqwalizer documentation](https://github.com/WhatsApp/eqwalizer/?tab=readme-ov-file#using-it-with-non-rebar-projects)
 
 For the feature-matrix project, this file might have the following structure:
+
 ```json
 {
   "apps": [
     {
       "name": "ety-test",
       "dir": ".",
-      "src_dirs": ["ety-src"]
+      "src_dirs": [
+        "ety-src"
+      ]
     },
     {
       "name": "gradualizer-test",
       "dir": ".",
-      "src_dirs": ["gradualizer-src"]
+      "src_dirs": [
+        "gradualizer-src"
+      ]
     }
   ]
 }
@@ -88,5 +94,8 @@ There are multiple command line options to customize the behaviour of the test r
 - `--disable-parallellism` | `-d`: Disables parallellism. This will run all tests sequentially.
 - `--timeout-executable <path>` | `-t <path>`: The path to the `timeout` executable. Defaults to a `timeout` executable
   in the current working directory.
+- `--ety-dir <path>`: The path to the directory of an `ety` executable. Defaults to the current directory. **This option
+  is required for some ety versions due to an issue in ety.**
+- `--debug`: Enables debug logging. Will print all outputs from the analyzer executions to the command line.
 
 The timeout executable is used to limit both memory usage and runtime of the tested analyzer executables.
