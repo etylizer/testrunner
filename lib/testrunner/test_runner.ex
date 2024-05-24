@@ -127,7 +127,6 @@ defmodule TestRunner.Runner do
       1 -> :fail
       2 -> :fail
       5 -> :not_implemented
-      127 -> :not_implemented
       124 -> :timeout
       137 -> :crash_memory
       _ -> :unknown
