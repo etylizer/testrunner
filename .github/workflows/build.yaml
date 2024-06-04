@@ -25,3 +25,9 @@ jobs:
 
       - name: Execute Runner on test data
         run: out/testrunner -s test-src
+      - name: Archive test results
+
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: test_results.json
