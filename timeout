@@ -192,14 +192,8 @@ while ($status eq 'wait'){
 			usleep($uflush_time);
 			print_uinfo($reason,$uinfo);
 			# If we killed the child process, we may need to return its error code.
-			if ($confess) {
-				if (waitpid($blackbox_pid,0) != -1){
-					exit(child_status_to_exit_code($?));
-				}
-			}else{
-				exit 0;
-			}
-		}
+			exit($reason)
+		} 
 	}
 }
 
@@ -366,7 +360,7 @@ sub kill_process_group_safely
 	$SIG{'ALRM'} = 'DEFAULT';
 	unless ($just_kill) {
 		print STDERR "timeout: Sending TERM\n" if $debug;
-		signal_to_process_group_safely($pgrp,SIGTERM);
+		signal_to_process_group_safely($pgrp,SIGKILL);
 		sleep(1);
 	}
 	print STDERR "timeout: Sending KILL\n" if $debug;
@@ -492,18 +486,14 @@ sub get_patterns
 sub limits_exceeded
 {
 	if (defined $timelimit && $timeinfo->{total} > $timelimit){
-    # HACK kill all lost children processes
-    `/bin/bash ./fix`;
-    exit 124;
+		return 124;
 	}elsif (defined $ticklimit && $kill_stale && $timeinfo->{ticks_stale} > $ticklimit) {
 	# Sometimes the controlling process may inherently hang up.  Then we don't interrupt it.
-		return 'HANGUP';
+		return 138;
 	}elsif (defined $memlimit && $meminfo > $memlimit){
-    `/bin/bash ./fix`;
-    exit 137;
+		return 137;
 	}elsif (defined $memlimit_rss && $meminfo_rss > $memlimit_rss){
-    `/bin/bash ./fix`;
-    exit 137;
+		return 137;
 	}
 	return undef;
 }
