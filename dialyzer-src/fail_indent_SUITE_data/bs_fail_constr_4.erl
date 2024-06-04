@@ -1,0 +1,5 @@
+-module(bs_fail_constr_4).
+-compile([nowarn_export_all, export_all]).
+
+w4(V) when is_float(V) ->
+  <<V/utf32>>.
