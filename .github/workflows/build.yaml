@@ -28,7 +28,7 @@ jobs:
         run: dialyzer --build_plt --apps erts kernel stdlib || true
 
       - name: Print dialyzer info
-        run: dialyzer --version && dialyzer
+        run: dialyzer --version && (dialyzer || true)
 
       - name: Print gradualizer info
         run: ./gradualizer --version
