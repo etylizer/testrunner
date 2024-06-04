@@ -25,7 +25,7 @@ jobs:
 
       # build plt first
       - name: Print dialyzer info
-        run: dialyzer --build_plt --apps erts kernel stdlib
+        run: dialyzer --build_plt --apps erts kernel stdlib || true
 
       - name: Print dialyzer info
         run: dialyzer --version && dialyzer
