@@ -12,8 +12,7 @@ defmodule TestRunner.Cli do
 
     test_data = TestRunner.TestCollector.collect_tests(test_suites, test_categories)
 
-    run_eqwalizer = File.exists?("elp") && File.exists?("project.json")
-    executables = compute_executable_list(run_eqwalizer)
+    executables = compute_executable_list()
 
     test_results = Enum.map(executables, fn executable = {exec_type, _} ->
       IO.inspect({:executable, exec_type})
@@ -40,24 +39,14 @@ defmodule TestRunner.Cli do
     {test_suites, test_categories, %TestRunner.TestConfig{timeout_executable: timeout_executable, disable_parallelism: disable_parallelism, ety_dir: ety_dir, debug_mode: debug_mode}}
   end
 
-  @spec compute_executable_list(boolean()) :: [{atom(), String.t()}]
-  defp compute_executable_list(run_eqwalizer) do
-    if run_eqwalizer do
-      [
-        {:dialyzer, "dialyzer"},
-        {:etylizer, "./ety"},
-        {:gradualizer, "./gradualizer"},
-        {:eqwalizer, "./elp"}
-      ]
-    else
-      # IO.puts("Eqwalizer executable or project.json not found. Skipping eqwalizer execution")
-      [
-        {:dialyzer, "dialyzer"},
-        {:etylizer, "./ety"},
-        {:gradualizer, "./gradualizer"},
-        {:eqwalizer, "./elp"} #FIXME added anyway
-      ]
-    end
+  @spec compute_executable_list() :: [{atom(), String.t()}]
+  defp compute_executable_list() do
+    [
+      {:dialyzer, "dialyzer"},
+      {:etylizer, "./ety"},
+      {:gradualizer, "./gradualizer"},
+      {:eqwalizer, "./elp"}
+    ]
   end
 
   defp save_results(test_results) do

@@ -69,7 +69,7 @@ defmodule TestRunner.Runner do
   @spec run_test(term(), {atom(), String.t()}, atom(), String.t(), TestRunner.TestConfig.t()) :: %{raw_result: test_result(), result: test_result(), time_diff: integer()}
   defp run_test(suite_name, executable, expected_result, test_file, options) do
     start_time = :os.system_time(:millisecond)
-    {output, exit_code} = construct_execution(suite_name, executable, test_file).(options.timeout_executable, options.ety_dir)
+    {output, exit_code} = construct_execution(suite_name, executable, test_file).(options.timeout_executable)
     if options.debug_mode do
       IO.puts(output)
     end
@@ -78,19 +78,15 @@ defmodule TestRunner.Runner do
     Map.put(evaluate_result(exit_code, output, expected_result, executable), :time_diff, time_diff)
   end
 
-  @spec construct_execution(term(), {atom(), String.t()}, String.t()) :: (String.t, String.t -> {String.t(), non_neg_integer()})
+  @spec construct_execution(term(), {atom(), String.t()}, String.t()) :: (String.t -> {String.t(), non_neg_integer()})
   defp construct_execution(category_name, {type, path}, test_file) do
     args = case type do
       :dialyzer -> [path, "--src", test_file]
       :eqwalizer -> [path, "eqwalize", Path.basename(test_file, ".erl"), "--project", Path.basename(category_name) <> "-project.json"]
-      :etylizer -> [path, Path.absname(test_file)]
       _ -> [path, test_file]
     end
 
-    case type do
-      :etylizer -> fn timeout_executable, ety_dir -> System.cmd(timeout_executable, ["-t", "10", "-s", "600000" | args], stderr_to_stdout: true, cd: ety_dir) end
-      _ -> fn timeout_executable, _ety_dir -> System.cmd(timeout_executable, ["-t", "10", "-s", "600000" | args], stderr_to_stdout: true) end
-    end
+    fn timeout_executable -> System.cmd(timeout_executable, ["-t", "10", "-s", "600000" | args], stderr_to_stdout: true) end
   end
 
   @spec evaluate_result(integer(), String.t(), atom(), {atom(), String.t()}) :: %{raw_result: test_result(), result: test_result()}
