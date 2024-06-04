@@ -40,7 +40,7 @@ jobs:
         run: ./elp version
 
       - name: Execute Runner on test data
-        run: out/testrunner -s test-src
+        run: out/testrunner --disable-parallelism -s etylizer-src -s dialyzer-src -s gradualizer-src -s eqwalizer-src
       - name: Archive test results
 
         uses: actions/upload-artifact@v4

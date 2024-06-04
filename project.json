@@ -1,9 +1,24 @@
 {
   "apps": [
     {
-      "name": "test_src",
+      "name": "dialyzer",
       "dir": ".",
-      "src_dirs": ["test-src"]
+      "src_dirs": ["dialyzer-src"]
+    },
+    {
+      "name": "eqwalizer",
+      "dir": ".",
+      "src_dirs": ["eqwalizer-src"]
+    },
+    {
+      "name": "gradualizer",
+      "dir": ".",
+      "src_dirs": ["gradualizer-src"]
+    },
+    {
+      "name": "etylizer",
+      "dir": ".",
+      "src_dirs": ["etylizer-src"]
     }
   ]
 }
