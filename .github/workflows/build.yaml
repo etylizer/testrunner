@@ -23,6 +23,10 @@ jobs:
       - name: Build escript executable
         run: MIX_ENV=prod mix escript.build
 
+      # build plt first
+      - name: Print dialyzer info
+        run: dialyzer --build_plt --apps erts kernel stdlib
+
       - name: Print dialyzer info
         run: dialyzer --version && dialyzer
 
