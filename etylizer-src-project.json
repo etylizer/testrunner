@@ -1,0 +1,9 @@
+{
+  "apps": [
+    {
+      "name": "etylizer",
+      "dir": ".",
+      "src_dirs": ["etylizer-src"]
+    }
+  ]
+}

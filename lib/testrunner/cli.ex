@@ -50,11 +50,12 @@ defmodule TestRunner.Cli do
         {:eqwalizer, "./elp"}
       ]
     else
-      IO.puts("Eqwalizer executable or project.json not found. Skipping eqwalizer execution")
+      # IO.puts("Eqwalizer executable or project.json not found. Skipping eqwalizer execution")
       [
         {:dialyzer, "dialyzer"},
         {:etylizer, "./ety"},
-        {:gradualizer, "./gradualizer"}
+        {:gradualizer, "./gradualizer"},
+        {:eqwalizer, "./elp"} #FIXME added anyway
       ]
     end
   end

@@ -1,0 +1,9 @@
+{
+  "apps": [
+    {
+      "name": "eqwalizer",
+      "dir": ".",
+      "src_dirs": ["eqwalizer-src"]
+    }
+  ]
+}

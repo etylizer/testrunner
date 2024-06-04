@@ -39,8 +39,9 @@ jobs:
       - name: Print eqWAlizer info 
         run: ./elp version
 
-      - name: Execute Runner on test data
-        run: out/testrunner --disable-parallelism -s etylizer-src -s dialyzer-src -s gradualizer-src -s eqwalizer-src
+      - name: Execute Runner on test suites
+        run: out/testrunner --disable-parallelism -s etylizer-src,dialyzer-src,gradualizer-src,eqwalizer-src
+        
       - name: Archive test results
 
         uses: actions/upload-artifact@v4

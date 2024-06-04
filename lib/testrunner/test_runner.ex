@@ -31,12 +31,12 @@ defmodule TestRunner.Runner do
     IO.inspect({:suite, suite_name})
 
     Enum.map(test_categories, fn test_category ->
-      run_category_tests(executable, test_category, options)
+      run_category_tests(suite_name, executable, test_category, options)
     end)
   end
 
-  @spec run_category_tests({atom(), String.t()}, TestRunner.TestCollector.test_category(), TestRunner.TestConfig.t()) :: category_result()
-  defp run_category_tests(executable, %{
+  @spec run_category_tests(term(), {atom(), String.t()}, TestRunner.TestCollector.test_category(), TestRunner.TestConfig.t()) :: category_result()
+  defp run_category_tests(suite_name, executable, %{
          category: category_name,
          expected_result: expected_result,
          files: files
@@ -46,10 +46,10 @@ defmodule TestRunner.Runner do
     category_start_time = :os.system_time(:millisecond)
     results = case disable_parallelism do
       true ->
-        Enum.map(files, fn test_file -> process_test_file(test_file, executable, expected_result, options) end)
+        Enum.map(files, fn test_file -> process_test_file(suite_name, test_file, executable, expected_result, options) end)
       false ->
         Flow.from_enumerable(files, min_demand: 1, max_demand: 2)
-        |> Flow.map(fn test_file -> process_test_file(test_file, executable, expected_result, options) end)
+        |> Flow.map(fn test_file -> process_test_file(suite_name, test_file, executable, expected_result, options) end)
         |> Enum.to_list()
     end
 
@@ -59,30 +59,30 @@ defmodule TestRunner.Runner do
     %{category: category_name, results: results, actual_time: actual_time, total_time: total_time}
   end
 
-  @spec process_test_file(String.t(), {atom(), String.t()}, atom(), TestRunner.TestConfig.t()) :: file_result()
-  defp process_test_file(test_file, executable, expected_result, options) do
-    %{raw_result: raw_result, result: test_result, time_diff: time_diff} = run_test(executable, expected_result, test_file, options)
+  @spec process_test_file(term(), String.t(), {atom(), String.t()}, atom(), TestRunner.TestConfig.t()) :: file_result()
+  defp process_test_file(suite_name, test_file, executable, expected_result, options) do
+    %{raw_result: raw_result, result: test_result, time_diff: time_diff} = run_test(suite_name, executable, expected_result, test_file, options)
     IO.inspect({test_file, test_result})
     %{file: test_file, time: time_diff, result: test_result, raw_result: raw_result, expected_result: expected_result}
   end
 
-  @spec run_test({atom(), String.t()}, atom(), String.t(), TestRunner.TestConfig.t()) :: %{raw_result: test_result(), result: test_result(), time_diff: integer()}
-  defp run_test(executable, expected_result, test_file, options) do
+  @spec run_test(term(), {atom(), String.t()}, atom(), String.t(), TestRunner.TestConfig.t()) :: %{raw_result: test_result(), result: test_result(), time_diff: integer()}
+  defp run_test(suite_name, executable, expected_result, test_file, options) do
     start_time = :os.system_time(:millisecond)
-    {output, exit_code} = construct_execution(executable, test_file).(options.timeout_executable, options.ety_dir)
+    {output, exit_code} = construct_execution(suite_name, executable, test_file).(options.timeout_executable, options.ety_dir)
     if options.debug_mode do
-      IO.inspect(output)
+      IO.puts(output)
     end
     end_time = :os.system_time(:millisecond)
     time_diff = end_time - start_time
     Map.put(evaluate_result(exit_code, output, expected_result, executable), :time_diff, time_diff)
   end
 
-  @spec construct_execution({atom(), String.t()}, String.t()) :: (String.t, String.t -> {String.t(), non_neg_integer()})
-  defp construct_execution({type, path}, test_file) do
+  @spec construct_execution(term(), {atom(), String.t()}, String.t()) :: (String.t, String.t -> {String.t(), non_neg_integer()})
+  defp construct_execution(category_name, {type, path}, test_file) do
     args = case type do
       :dialyzer -> [path, "--src", test_file]
-      :eqwalizer -> [path, "eqwalize", Path.basename(test_file, ".erl"), "--project", "project.json"]
+      :eqwalizer -> [path, "eqwalize", Path.basename(test_file, ".erl"), "--project", Path.basename(category_name) <> "-project.json"]
       :etylizer -> [path, Path.absname(test_file)]
       _ -> [path, test_file]
     end

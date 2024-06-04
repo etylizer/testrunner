@@ -1,0 +1,9 @@
+{
+  "apps": [
+    {
+      "name": "dialyzer",
+      "dir": ".",
+      "src_dirs": ["dialyzer-src"]
+    }
+  ]
+}

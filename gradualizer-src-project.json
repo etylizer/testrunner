@@ -1,0 +1,9 @@
+{
+  "apps": [
+    {
+      "name": "gradualizer",
+      "dir": ".",
+      "src_dirs": ["gradualizer-src"]
+    }
+  ]
+}
