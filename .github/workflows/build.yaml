@@ -34,7 +34,7 @@ jobs:
         run: ./gradualizer --version
 
       - name: Print ety info # has no version yet
-        run: ./ety
+        run: ./ety || true
 
       - name: Print eqWAlizer info 
         run: ./elp version
