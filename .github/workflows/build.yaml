@@ -23,6 +23,18 @@ jobs:
       - name: Build escript executable
         run: MIX_ENV=prod mix escript.build
 
+      - name: Print dialyzer info
+        run: dialyzer --version && dialyzer
+
+      - name: Print gradualizer info
+        run: ./gradualizer --version
+
+      - name: Print ety info # has no version yet
+        run: ./ety
+
+      - name: Print eqWAlizer info 
+        run: ./elp version
+
       - name: Execute Runner on test data
         run: out/testrunner -s test-src
       - name: Archive test results
