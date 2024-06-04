@@ -88,8 +88,8 @@ defmodule TestRunner.Runner do
     end
 
     case type do
-      :etylizer -> fn timeout_executable, ety_dir -> System.cmd(timeout_executable, ["-t", "10", "-s", "6000000" | args], stderr_to_stdout: true, cd: ety_dir) end
-      _ -> fn timeout_executable, _ety_dir -> System.cmd(timeout_executable, ["-t", "10", "-s", "6000000" | args], stderr_to_stdout: true) end
+      :etylizer -> fn timeout_executable, ety_dir -> System.cmd(timeout_executable, ["-t", "10", "-s", "600000" | args], stderr_to_stdout: true, cd: ety_dir) end
+      _ -> fn timeout_executable, _ety_dir -> System.cmd(timeout_executable, ["-t", "10", "-s", "600000" | args], stderr_to_stdout: true) end
     end
   end
 
