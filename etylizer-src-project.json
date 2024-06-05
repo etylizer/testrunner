@@ -3,7 +3,7 @@
     {
       "name": "etylizer",
       "dir": "etylizer-src",
-      "src_dirs": ["fail_simple", "fail_tycheck", "fail_tycheck_2","fail_ty_errors","pass_simple","pass_tycheck","pass_tycheck_2"]
+      "src_dirs": ["fail_simple", "fail_tycheck", "fail_tycheck_2","fail_type_errors","pass_simple","pass_tycheck","pass_tycheck_2"]
     },
     {
       "name": "eqwalizer_support",
