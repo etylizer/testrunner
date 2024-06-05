@@ -2,14 +2,13 @@
   "apps": [
     {
       "name": "gradualizer",
-      "dir": ".",
-      "src_dirs": ["gradualizer-src"]
-    }
-  ],
-  "deps": [
+      "dir": "gradualizer-src",
+      "src_dirs": ["fail", "fail_misc", "fail_problem","pass","pass_misc","pass_problem"]
+    },
     {
-      "name": "eqwalizer",
-      "ebin": "_build/eqwalizer_support_ebin",
-      "dir": "."
+      "name": "eqwalizer_support",
+      "dir": "eqwalizer",
+      "src_dirs": ["src"]
     }
+  ]
 }

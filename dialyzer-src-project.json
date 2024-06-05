@@ -2,14 +2,13 @@
   "apps": [
     {
       "name": "dialyzer",
-      "dir": ".",
-      "src_dirs": ["dialyzer-src"]
-    }
-  ],
-  "deps": [
+      "dir": "dialyzer-src",
+      "src_dirs": ["fail_behaviour_SUITE_data","fail_callgraph_SUITE_data","fail_discuss","fail_indent_SUITE_data","fail_underspects_SUITE_data","fail_user_SUITE_data","pass_behaviour_SUITE_data","pass_cplt_SUITE_data","pass_default_ignore_overlapping_contract_SUITE_data","pass_discuss","pass_extra_return_SUITE_data","pass_indent2_SUITE_data","pass_indent_SUITE_data","pass_underspecs_SUITE_data","pass_unmatched_returns_SUITE_data","pass_user_SUITE_data"]
+    },
     {
-      "name": "eqwalizer",
-      "ebin": "_build/eqwalizer_support_ebin",
-      "dir": "."
+      "name": "eqwalizer_support",
+      "dir": "eqwalizer",
+      "src_dirs": ["src"]
     }
+  ]
 }

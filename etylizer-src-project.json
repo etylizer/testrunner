@@ -2,14 +2,13 @@
   "apps": [
     {
       "name": "etylizer",
-      "dir": ".",
-      "src_dirs": ["etylizer-src"]
-    }
-  ],
-  "deps": [
+      "dir": "etylizer-src",
+      "src_dirs": ["fail_simple", "fail_tycheck", "fail_tycheck_2","fail_ty_errors","pass_simple","pass_tycheck","pass_tycheck_2"]
+    },
     {
-      "name": "eqwalizer",
-      "ebin": "_build/eqwalizer_support_ebin",
-      "dir": "."
+      "name": "eqwalizer_support",
+      "dir": "eqwalizer",
+      "src_dirs": ["src"]
     }
+  ]
 }
