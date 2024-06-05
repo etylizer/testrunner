@@ -39,6 +39,9 @@ jobs:
       - name: Print eqWAlizer info 
         run: ./elp version
 
+      - name: Print timeout info 
+        run: ./timeout -t 5 -m 600000 echo OK
+
       - name: Execute Runner on test suites
         run: out/testrunner --disable-parallelism -s etylizer-src,dialyzer-src,gradualizer-src,eqwalizer-src
         
