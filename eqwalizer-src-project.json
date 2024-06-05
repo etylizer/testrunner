@@ -5,5 +5,12 @@
       "dir": ".",
       "src_dirs": ["eqwalizer-src"]
     }
+  ],
+  "deps": [
+    {
+      "name": "eqwalizer",
+      "ebin": "_build/eqwalizer_support_ebin",
+      "dir": "."
+    }
   ]
 }

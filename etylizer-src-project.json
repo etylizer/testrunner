@@ -5,5 +5,11 @@
       "dir": ".",
       "src_dirs": ["etylizer-src"]
     }
-  ]
+  ],
+  "deps": [
+    {
+      "name": "eqwalizer",
+      "ebin": "_build/eqwalizer_support_ebin",
+      "dir": "."
+    }
 }
