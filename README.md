@@ -2,13 +2,21 @@
 
 An elixir application used to run various erlang type checkers on a set of tests.
 
+## Roadmap
+
+* [ ] Multi-module test cases
+* [ ] Automated conversion of test suites to the test runner format
+  * [X] eqWAlizer
+  * [ ] Dialyzer
+  * [ ] Gradualizer
+  * [ ] etylizer
+
 ## Requirements
 
 - Elixir 1.15.0 or higher
-- A linux system where the custom `timeout` command is available (needs to support `-t` and `-s` flags for time and
-  memory limits)
-    - Windows is not supported out of the box, however, if you can provide a windows-compatible `timeout` executable, it
-      should work
+- perl        
+- Dialyzer plt is already built
+  - e.g. with `dialyzer --build_plt --apps erts kernel stdlib`
 
 ## Build and Run
 
@@ -21,11 +29,26 @@ mix escript.build
 For development, use:
 
 ```bash
-mix run mix run -e TestRunner.Cli.main -- -s <test-suite-paths>
+mix run -e TestRunner.Cli.main -- -s <test-suite-paths>
 ```
 
 The test suite paths should be relative to the current working directory. Multiple test suites can be separated by a
 comma.
+
+For production, use:
+
+```bash
+MIX_ENV=prod mix escript.build
+```
+
+This will generate the executable `out/testrunner`.
+
+Executing `out/testrunner` is equivalent to specifying the following test suites manually:
+
+```bash
+./out/testrunner -s eqwalizer-src,gradualizer-src,etylizer-src,dialyzer-src
+```
+
 
 ## Usage
 
@@ -56,32 +79,12 @@ Valid expected results are:
 
 Any other expected result will be mapped to `unknown`.
 
-In order to run eqwalizer, an additional `project.json` file in the root working directory is needed.
+In order to run eqwalizer, an additional `project.json` file per test suite in the root working directory is needed.
+The `project.json` file should be prefixed with the test suite name.
 The structure of this file is described in
-the [eqwalizer documentation](https://github.com/WhatsApp/eqwalizer/?tab=readme-ov-file#using-it-with-non-rebar-projects)
-
-For the feature-matrix project, this file might have the following structure:
-
-```json
-{
-  "apps": [
-    {
-      "name": "ety-test",
-      "dir": ".",
-      "src_dirs": [
-        "ety-src"
-      ]
-    },
-    {
-      "name": "gradualizer-test",
-      "dir": ".",
-      "src_dirs": [
-        "gradualizer-src"
-      ]
-    }
-  ]
-}
-```
+the [eqwalizer documentation](https://github.com/WhatsApp/eqwalizer/?tab=readme-ov-file#using-it-with-non-rebar-projects).
+Check the examples inside this repository for proper inclusion of the `eqwalizer_support`
+modules.
 
 ### Command line options
 
@@ -91,7 +94,7 @@ There are multiple command line options to customize the behaviour of the test r
   working directory. Multiple test suites can be separated by a comma.
 - `--categories <categories>` | `-c <categories>`: The categories to run. Multiple categories can be separated by a
   comma. If no categories are specified, all categories will be run. **Needs at least one test suite to be specified**
-- `--disable-parallellism` | `-d`: Disables parallellism. This will run all tests sequentially.
+- `--enable-parallellism` | `-d`: Enables parallellism. This will run all tests in parallel.
 - `--timeout-executable <path>` | `-t <path>`: The path to the `timeout` executable. Defaults to a `timeout` executable
   in the current working directory.
 - `--ety-dir <path>`: The path to the directory of an `ety` executable. Defaults to the current directory. **This option

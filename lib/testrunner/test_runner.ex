@@ -40,14 +40,14 @@ defmodule TestRunner.Runner do
          category: category_name,
          expected_result: expected_result,
          files: files
-       }, options = %TestRunner.TestConfig{disable_parallelism: disable_parallelism}) do
+       }, options = %TestRunner.TestConfig{enable_parallelism: enable_parallelism}) do
     IO.inspect({:category, category_name})
 
     category_start_time = :os.system_time(:millisecond)
-    results = case disable_parallelism do
-      true ->
-        Enum.map(files, fn test_file -> process_test_file(suite_name, test_file, executable, expected_result, options) end)
+    results = case enable_parallelism do
       false ->
+        Enum.map(files, fn test_file -> process_test_file(suite_name, test_file, executable, expected_result, options) end)
+      true ->
         Flow.from_enumerable(files, min_demand: 1, max_demand: 2)
         |> Flow.map(fn test_file -> process_test_file(suite_name, test_file, executable, expected_result, options) end)
         |> Enum.to_list()

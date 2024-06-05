@@ -30,3 +30,4 @@ testrunner-*.tar
 *.log
 test_results.json
 out/
+_etylizer

@@ -6,8 +6,8 @@ defmodule TestRunner.Cli do
 
 #    test_mode = Map.get(named_opts, :test, false)
 
-    if options.disable_parallelism do
-      IO.puts("Parallelism disabled. Execution time can increase significantly!")
+    if options.enable_parallelism do
+      IO.puts("Parallelism enabled. Memory consumption of running multiple tests at once can lead to unexpected crashes.")
     end
 
     test_data = TestRunner.TestCollector.collect_tests(test_suites, test_categories)
@@ -25,18 +25,18 @@ defmodule TestRunner.Cli do
   @spec retrieve_cli_params([String.t()]) :: {[String.t()], [String.t()], TestRunner.TestConfig.t()}
   defp retrieve_cli_params(args) do
     {named_opts_raw, _other_opts, _errors} = OptionParser.parse(args,
-      strict: [suites: :string, categories: :string, disable_parallelism: :boolean, timeout_executable: :string, test: :boolean, ety_dir: :string, debug: :boolean],
-      aliases: [s: :suites, c: :categories, d: :disable_parallelism, t: :timeout_executable])
+      strict: [suites: :string, categories: :string, enable_parallelism: :boolean, timeout_executable: :string, test: :boolean, ety_dir: :string, debug: :boolean],
+      aliases: [s: :suites, c: :categories, d: :enable_parallelism, t: :timeout_executable])
     named_opts = Map.new(named_opts_raw)
 
-    test_suites = String.split(Map.get(named_opts, :suites, "ety-src,gradualizer-src"), ",")
+    test_suites = String.split(Map.get(named_opts, :suites, "eqwalizer-src,dialyzer-src,etylizer-src,gradualizer-src"), ",")
     test_categories = String.split(Map.get(named_opts, :categories, ""), ",", trim: true)
-    disable_parallelism = Map.get(named_opts, :disable_parallelism, false)
+    enable_parallelism = Map.get(named_opts, :enable_parallelism, false)
     timeout_executable = Map.get(named_opts, :timeout_executable, Path.absname("./timeout"))
     ety_dir = Map.get(named_opts, :ety_dir, Path.absname("."))
     debug_mode = Map.get(named_opts, :debug, false)
 
-    {test_suites, test_categories, %TestRunner.TestConfig{timeout_executable: timeout_executable, disable_parallelism: disable_parallelism, ety_dir: ety_dir, debug_mode: debug_mode}}
+    {test_suites, test_categories, %TestRunner.TestConfig{timeout_executable: timeout_executable, enable_parallelism: enable_parallelism, ety_dir: ety_dir, debug_mode: debug_mode}}
   end
 
   @spec compute_executable_list() :: [{atom(), String.t()}]

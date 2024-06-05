@@ -40,10 +40,10 @@ jobs:
         run: ./elp version
 
       - name: Print timeout info 
-        run: ./timeout -t 5 -m 600000 echo OK
+        run: ./timeout -t 10 -m 2000000 echo OK
 
       - name: Execute Runner on test suites
-        run: out/testrunner --disable-parallelism -s etylizer-src,dialyzer-src,gradualizer-src,eqwalizer-src
+        run: out/testrunner -s etylizer-src,dialyzer-src,gradualizer-src,eqwalizer-src
         
       - name: Archive test results
 
