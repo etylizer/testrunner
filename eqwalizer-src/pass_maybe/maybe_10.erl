@@ -5,7 +5,6 @@
 -compile([export_all, nowarn_export_all]).
 -type maybe(A) :: {'$#maybe:maybe.just', A} |
                   {'$#maybe:maybe.nothing'}.
--export_type([maybe/1]).
 -spec destruct(B, fun((A) -> B), maybe(A)) -> B.
 destruct(_Default, Func, {'$#maybe:maybe.just', A}) ->
     Func(A);

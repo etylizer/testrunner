@@ -6,10 +6,6 @@
 -type order() :: {'$#basics:order.lt'} |
                  {'$#basics:order.eq'} |
                  {'$#basics:order.gt'}.
--type never() :: {'$#basics:never.just_one_more',
-                  never()}.
--export_type([order/0]).
--export_type([never/0]).
 -spec eq(A, A) -> boolean().
 lt(X1, X2) -> X1 < X2.
 -spec lt(A, A) -> boolean().

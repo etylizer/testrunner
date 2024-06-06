@@ -6,13 +6,3 @@
 -spec foldr(fun((A, B) -> B), B, [A]) -> B.
 foldr(F, Acc, [H | T]) -> F(H, foldr(F, Acc, T));
 foldr(_F, Acc, []) -> Acc.
--spec filter(fun((A) -> boolean()), [A]) -> [A].
-filter(F, List) ->
-    foldr(fun (X, Xs) ->
-                  case F(X) of
-                      true -> [X | Xs];
-                      false -> Xs
-                  end
-          end,
-          [],
-          List).

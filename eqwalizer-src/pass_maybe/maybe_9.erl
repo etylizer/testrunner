@@ -5,7 +5,6 @@
 -compile([export_all, nowarn_export_all]).
 -type maybe(A) :: {'$#maybe:maybe.just', A} |
                   {'$#maybe:maybe.nothing'}.
--export_type([maybe/1]).
 -spec is_just(maybe(_)) -> boolean().
 is_just({'$#maybe:maybe.just', _}) -> true;
 is_just({'$#maybe:maybe.nothing'}) -> false.

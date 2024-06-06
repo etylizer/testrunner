@@ -4,6 +4,5 @@
 %%% the LICENSE file in the root directory of this source tree.
 -compile([export_all, nowarn_export_all]).
 -type map_(K, V) :: #{K => V}.
--export_type([map_/2]).
 -spec fold(fun((K, V, R) -> R), R, map_(K, V)) -> R.
 fold(F, Acc, Map) -> maps:fold(F, Acc, Map).

@@ -5,7 +5,6 @@
 -compile([export_all, nowarn_export_all]).
 -type maybe(A) :: {'$#maybe:maybe.just', A} |
                   {'$#maybe:maybe.nothing'}.
--export_type([maybe/1]).
 -spec with_default(A, maybe(A)) -> A.
 with_default(_Default, {'$#maybe:maybe.just', Value}) ->
     Value;

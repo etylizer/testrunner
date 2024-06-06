@@ -5,7 +5,6 @@
 -compile([export_all, nowarn_export_all]).
 -type maybe(A) :: {'$#maybe:maybe.just', A} |
                   {'$#maybe:maybe.nothing'}.
--export_type([maybe/1]).
 -spec map2(fun((A, B) -> C), maybe(A),
            maybe(B)) -> maybe(C).
 map2(F, {'$#maybe:maybe.just', A},

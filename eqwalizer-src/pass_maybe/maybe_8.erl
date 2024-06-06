@@ -5,7 +5,6 @@
 -compile([export_all, nowarn_export_all]).
 -type maybe(A) :: {'$#maybe:maybe.just', A} |
                   {'$#maybe:maybe.nothing'}.
--export_type([maybe/1]).
 -spec and_then(fun((A) -> maybe(B)),
                maybe(A)) -> maybe(B).
 and_then(Callback, {'$#maybe:maybe.just', Value}) ->

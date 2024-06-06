@@ -3,24 +3,8 @@
 %%% This source code is licensed under the Apache 2.0 license found in 
 %%% the LICENSE file in the root directory of this source tree.
 -compile([export_all, nowarn_export_all]).
--record(foo,
-        {a :: ok | error, b :: number(), c :: string()}).
--record(rec, {field :: number()}).
--type my_tup() :: {k1, v1} | {k2, v2}.
 -type plist(K, V) :: [K | {K, V}].
--type mylist(A, B) :: [A | [A | B]].
--type reclist(A) :: [A | reclist(A)].
--type reclist2() :: [nil] | [reclist2()].
--type reclist3(A, B) :: [{A, B} | reclist3(B, A)].
--type id(T) :: T.
--type id2(T) :: id(T).
--type infinikey(T) :: [T | infinikey(T)].
--type state1() :: #{module := module(),
-                    count := number()}.
--type state2() :: #{module => module(),
-                    count => number()}.
--type a_n_map() :: #{atom() => number()}.
--spec 'test_plists_get_value/2_overlap'(plist({k, v},
-                                              pid())) -> pid() | undefined | v.
-'test_plists_get_value/2_overlap'(L) ->
-    proplists:get_value(k, L).
+-spec test_plists_get_all_values3(plist(atom(),
+                                        pid())) -> [pid()].
+test_plists_get_all_values3(L) ->
+    proplists:get_all_values(k, L).

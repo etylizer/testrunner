@@ -6,7 +6,7 @@
 -type data() :: {tag1, atom()} |
                 {tag1, binary()} |
                 {tag2, pid()}.
--spec cast1() -> atom().
-cast1() ->
-    Key = get(key),
-    Key.
+-spec reveal_type1a(data()) -> atom().
+reveal_type1a({tag1, _A}) ->
+    eqwalizer:reveal_type(_A),
+    tag1.

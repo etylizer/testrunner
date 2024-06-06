@@ -3,8 +3,5 @@
 %%% This source code is licensed under the Apache 2.0 license found in 
 %%% the LICENSE file in the root directory of this source tree.
 -compile([export_all, nowarn_export_all]).
--record(rec, {method :: fun((atom()) -> pid())}).
--spec test_15e_neg(fun((a) -> b) | fun(() -> b)) -> b.
-test_15e_neg(F) ->
-    Res = F(a),
-    Res.
+-spec test_15_neg(fun((a) -> b) | fun(() -> b)) -> b.
+test_15_neg(F) -> F(a).

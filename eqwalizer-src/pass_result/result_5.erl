@@ -6,7 +6,6 @@
 -type result(Error, Value) :: {'$#result:result.ok',
                                Value} |
                               {'$#result:result.err', Error}.
--export_type([result/2]).
 -spec map2(fun((A, B) -> C), result(X, A),
            result(X, B)) -> result(X, C).
 map2(_Func, {'$#result:result.err', X}, _) ->

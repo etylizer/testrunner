@@ -4,13 +4,9 @@
 %%% the LICENSE file in the root directory of this source tree.
 -compile([export_all, nowarn_export_all]).
 -record(rec1, {id :: integer(), name :: string()}).
--record(rec2, {name :: string(), id :: integer()}).
--type version() :: non_neg_integer().
--type version3() :: {version(), version(), version()}.
 -type version3_int() :: {integer(),
                          integer(),
                          integer()}.
--type user() :: #rec1{} | integer().
 -spec id7(#rec1{} | version3_int()) -> integer().
 id7(#rec1{id = Id}) -> Id;
 id7({X, _Y, _Z}) -> X.

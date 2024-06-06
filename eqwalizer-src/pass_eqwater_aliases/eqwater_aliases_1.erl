@@ -5,8 +5,6 @@
 -compile([export_all, nowarn_export_all]).
 -type occ01_in() :: a | b.
 -type occ01_out() :: b.
--type occ02_in() :: a | {b, integer()}.
--type occ02_out() :: integer().
 -spec occ01(occ01_in()) -> occ01_out().
 occ01(Arg) ->
     case Arg of

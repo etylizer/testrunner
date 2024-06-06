@@ -6,7 +6,6 @@
 -type result(Error, Value) :: {'$#result:result.ok',
                                Value} |
                               {'$#result:result.err', Error}.
--export_type([result/2]).
 -spec is_ok(result(_, _)) -> boolean().
 is_ok({'$#result:result.ok', _}) -> true;
 is_ok({'$#result:result.err', _}) -> false.

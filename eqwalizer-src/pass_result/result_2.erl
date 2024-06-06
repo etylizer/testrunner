@@ -6,7 +6,6 @@
 -type result(Error, Value) :: {'$#result:result.ok',
                                Value} |
                               {'$#result:result.err', Error}.
--export_type([result/2]).
 -spec with_default(A, result(_, A)) -> A.
 with_default(_Def, {'$#result:result.ok', A}) -> A;
 with_default(Def, {'$#result:result.err', _E}) -> Def.

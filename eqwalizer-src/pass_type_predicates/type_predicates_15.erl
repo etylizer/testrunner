@@ -4,11 +4,6 @@
 %%% the LICENSE file in the root directory of this source tree.
 -compile([export_all, nowarn_export_all]).
 -record(rec1, {id :: atom()}).
--record(rec2, {id :: atom()}).
--record(f0, {f :: fun(() -> term())}).
--record(f1, {f :: fun((term()) -> term())}).
--record(f2, {f :: fun((term(), term()) -> term())}).
--type fs() :: #f0{} | #f1{} | #f2{}.
 -spec rec_slice1(#rec1{} | atom()) -> #rec1{}.
 rec_slice1(R) when is_record(R, rec1, 1) -> R;
 rec_slice1(A) when is_atom(A) -> #rec1{id = A}.

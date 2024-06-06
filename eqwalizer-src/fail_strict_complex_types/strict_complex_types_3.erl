@@ -5,9 +5,7 @@
 -compile([export_all, nowarn_export_all]).
 -type complex_map() :: #{id := integer(),
                          {secret, id} => integer(), atom() => term()}.
--spec mk_complex_map() -> complex_map().
-mk_complex_map() -> #{id => 1}.
--spec use_complex_map3() -> integer().
-use_complex_map3() ->
-    Map = mk_complex_map(),
-    maps:get(id, Map).
+-spec use_complex_map1(complex_map()) -> complex_map().
+use_complex_map1(Map) ->
+    eqwalizer:reveal_type(Map),
+    Map.

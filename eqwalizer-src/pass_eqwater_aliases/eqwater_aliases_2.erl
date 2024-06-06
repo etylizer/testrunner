@@ -5,8 +5,6 @@
 -compile([export_all, nowarn_export_all]).
 -type occ01_in() :: a | b.
 -type occ01_out() :: b.
--type occ02_in() :: a | {b, integer()}.
--type occ02_out() :: integer().
 -spec occ01_cl(occ01_in()) -> occ01_out().
 occ01_cl(a) -> b;
 occ01_cl(B) -> B.

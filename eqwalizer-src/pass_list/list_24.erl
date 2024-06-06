@@ -3,6 +3,5 @@
 %%% This source code is licensed under the Apache 2.0 license found in 
 %%% the LICENSE file in the root directory of this source tree.
 -compile([export_all, nowarn_export_all]).
--spec is_empty([_]) -> boolean().
-is_empty([_ | _]) -> false;
-is_empty([]) -> true.
+-spec append([A], [A]) -> [A].
+append(Xs, Ys) -> Xs ++ Ys.

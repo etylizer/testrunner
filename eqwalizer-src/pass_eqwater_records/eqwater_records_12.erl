@@ -5,12 +5,6 @@
 -compile([export_all, nowarn_export_all]).
 -record(rec1, {id :: integer(), name :: string()}).
 -record(rec2, {name :: string(), id :: integer()}).
--type version() :: non_neg_integer().
--type version3() :: {version(), version(), version()}.
--type version3_int() :: {integer(),
-                         integer(),
-                         integer()}.
--type user() :: #rec1{} | integer().
 -spec normalize({#rec1{}, #rec2{}} |
                 {#rec2{}, #rec1{}}) -> {#rec1{}, #rec2{}}.
 normalize({R2 = #rec2{}, R1}) -> {R1, R2};

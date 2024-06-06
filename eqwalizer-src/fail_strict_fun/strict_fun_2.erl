@@ -4,8 +4,6 @@
 %%% the LICENSE file in the root directory of this source tree.
 -compile([export_all, nowarn_export_all]).
 -record(fun_wrap1, {inner_fun :: fun()}).
--record(fun_wrap2,
-        {inner_fun :: fun((atom()) -> atom())}).
 -spec mk_fun_wrap1b() -> #fun_wrap1{}.
 mk_fun_wrap1b() ->
     #fun_wrap1{inner_fun = fun lists:filter/2}.

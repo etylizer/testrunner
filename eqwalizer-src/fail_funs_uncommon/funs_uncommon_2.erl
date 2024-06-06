@@ -4,7 +4,6 @@
 %%% the LICENSE file in the root directory of this source tree.
 -compile([export_all, nowarn_export_all]).
 -record(rectup, {field :: {fun((a) -> a), atom()}}).
--record(rec, {field :: fun((a) -> a)}).
 -spec test_02() -> #rectup{}.
 test_02() ->
     #rectup{field = {fun (X) -> X end, an_atom}}.

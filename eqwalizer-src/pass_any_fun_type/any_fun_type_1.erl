@@ -4,12 +4,5 @@
 %%% the LICENSE file in the root directory of this source tree.
 -compile([export_all, nowarn_export_all]).
 -type f0() :: fun(() -> term()).
--type f1() :: fun((term()) -> term()).
--type f2() :: fun((term(), term()) -> term()).
--type f3() :: fun((term(), term(), term()) -> term()).
--type f4(T) :: fun((...) -> T).
--type f5(T) :: fun((term()) -> T).
--type f6(T) :: fun((term(), term()) -> T).
--export_type([f0/0]).
 -spec f0_to_f_any_pos(f0()) -> fun().
 f0_to_f_any_pos(F) -> F.

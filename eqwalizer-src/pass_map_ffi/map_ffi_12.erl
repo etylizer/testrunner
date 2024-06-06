@@ -4,6 +4,5 @@
 %%% the LICENSE file in the root directory of this source tree.
 -compile([export_all, nowarn_export_all]).
 -type map_(K, V) :: #{K => V}.
--export_type([map_/2]).
 -spec to_list(map_(K, V)) -> [{K, V}].
 to_list(Map) -> maps:to_list(Map).

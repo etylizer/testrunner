@@ -6,7 +6,6 @@
 -type result(Error, Value) :: {'$#result:result.ok',
                                Value} |
                               {'$#result:result.err', Error}.
--export_type([result/2]).
 -spec and_then(fun((A) -> result(X, B)),
                result(X, A)) -> result(X, B).
 and_then(Callback, {'$#result:result.ok', Value}) ->
