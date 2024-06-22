@@ -102,3 +102,39 @@ There are multiple command line options to customize the behaviour of the test r
 - `--debug`: Enables debug logging. Will print all outputs from the analyzer executions to the command line.
 
 The timeout executable is used to limit both memory usage and runtime of the tested analyzer executables.
+
+## Test Result Processing
+
+Test results can be processed into various plots and tables with the `report-generator` tool.
+To use this tool, JDK 17 or newer (JDK 21 is recommended) is needed and has to be configured as default jdk.
+
+All output files will be placed in a directory called `report-output` relative to the current working directory.
+
+There are two ways of running the report generator.
+
+### Building the generator ahead of time
+
+To build the report generator, go to the `report-generator` directory and run the following command:
+
+```bash
+./gradlew :build
+```
+
+This will produce a jar file and a zip and a tar archive containing the report-generator binary.
+To run the report generator from the jar, use the following command (assuming the current working directory is set to the repository root):
+
+```bash
+java -jar report-generator/build/libs/report-generator-all.jar path-to-the-result-json-file
+```
+
+Alternatively, unpack either the tar or zip archive found in `report-generator/build/distributions` after running a build.
+After unpacking the archive, run the unpacked `bin/report-generator` file.
+Always ensure to pass the path to the result json file from the testrunner as the first argument to the executable.
+
+### Running the generator directly through Gradle
+
+Instead of building the executable explicitly, you can also run the report generator directly through gradle:
+
+```bash
+./gradlew :run --args="path-to-the-result-json-file"
+```
