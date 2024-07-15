@@ -28,13 +28,15 @@ fun main(args: Array<String>) {
     }
 
     val overallResultPlot = createOverallResultPlot(jsonData).also { overallResultPlot ->
-        overallResultPlot.save("result-data-plot.png", scale = 2, path = outputDirectory)
+        overallResultPlot.save("result-data-plot.png", scale = 2, path = outputDirectory, dpi = 300)
         overallResultPlot.save("result-data-plot.html", scale = 2, path = outputDirectory)
+        overallResultPlot.save("result-data-plot.svg", scale = 2, path = outputDirectory)
     }
 
     val categoryAverageTimePlot = createCategoryAverageTimePlot(jsonData).also { categoryAverageTimePlot ->
-        categoryAverageTimePlot.save("category-average-time-plot.png", scale = 2, path = outputDirectory)
+        categoryAverageTimePlot.save("category-average-time-plot.png", scale = 2, path = outputDirectory, dpi = 300)
         categoryAverageTimePlot.save("category-average-time-plot.html", scale = 2, path = outputDirectory)
+        categoryAverageTimePlot.save("category-average-time-plot.svg", scale = 2, path = outputDirectory)
     }
 
     val suiteSizes = createSuiteSizeTable(jsonData).also { suiteSizes ->
@@ -44,18 +46,21 @@ fun main(args: Array<String>) {
     }
 
     val suiteResults = createSuiteResultsPlot(jsonData, summaryDf).also { suiteResults ->
-        suiteResults.save("suite-results.png", scale = 2, path = outputDirectory)
+        suiteResults.save("suite-results.png", scale = 2, path = outputDirectory, dpi = 300)
         suiteResults.save("suite-results.html", scale = 2, path = outputDirectory)
+        suiteResults.save("suite-results.svg", scale = 2, path = outputDirectory)
     }
 
     val divergingSuiteResults = createDivergingSuiteResultsPlot(jsonData, summaryDf).also { divergingSuiteResults ->
-        divergingSuiteResults.save("diverging-results.png", scale = 2, path = outputDirectory)
+        divergingSuiteResults.save("diverging-results.png", scale = 2, path = outputDirectory, dpi = 300)
         divergingSuiteResults.save("diverging-results.html", scale = 2, path = outputDirectory)
+        divergingSuiteResults.save("diverging-results.svg", scale = 2, path = outputDirectory)
     }
 
     val divergingSuiteResultsNoDialyzer = createDivergingSuiteResultsPlot(jsonData, summaryDf, false).also { divergingSuiteResultsNoDialyzer ->
-        divergingSuiteResultsNoDialyzer.save("diverging-results-no-dialyzer.png", scale = 2, path = outputDirectory)
+        divergingSuiteResultsNoDialyzer.save("diverging-results-no-dialyzer.png", scale = 2, path = outputDirectory, dpi = 300)
         divergingSuiteResultsNoDialyzer.save("diverging-results-no-dialyzer.html", scale = 2, path = outputDirectory)
+        divergingSuiteResultsNoDialyzer.save("diverging-results-no-dialyzer.svg", scale = 2, path = outputDirectory)
     }
 
 }
