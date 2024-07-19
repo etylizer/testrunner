@@ -8,21 +8,33 @@ import org.jetbrains.kotlinx.dataframe.api.map
 import org.jetbrains.kotlinx.kandy.dsl.categorical
 import org.jetbrains.kotlinx.kandy.dsl.plot
 import org.jetbrains.kotlinx.kandy.ir.Plot
+import org.jetbrains.kotlinx.kandy.ir.bindings.NonPositionalMappingParameters
 import org.jetbrains.kotlinx.kandy.letsplot.feature.Position
 import org.jetbrains.kotlinx.kandy.letsplot.feature.layout
 import org.jetbrains.kotlinx.kandy.letsplot.feature.position
 import org.jetbrains.kotlinx.kandy.letsplot.layers.bars
+import org.jetbrains.kotlinx.kandy.letsplot.layers.context.aes.WithFillColor
 import org.jetbrains.kotlinx.kandy.letsplot.layers.line
 import org.jetbrains.kotlinx.kandy.letsplot.multiplot.model.PlotGrid
 import org.jetbrains.kotlinx.kandy.letsplot.multiplot.plotGrid
 import org.jetbrains.kotlinx.kandy.letsplot.scales.continuousColorViridis
 import org.jetbrains.kotlinx.kandy.util.color.Color
+import org.jetbrains.kotlinx.kandy.util.color.StandardColor
 import java.util.*
 
 private fun DataFrame<ResultSummary>.findDivergingResults(includeDialyzer: Boolean = true) = filter {
     val rowValues = if (includeDialyzer) listOf(dialyzer, eqwalizer, etylizer, gradualizer) else listOf(eqwalizer, etylizer, gradualizer)
     rowValues.contains(ResultType.Pass) && rowValues.contains(ResultType.Fail)
 }
+
+private fun NonPositionalMappingParameters<*, *>.createColorScale() = categorical(
+    ResultType.Pass to Color.hex("#016AA2"),
+    ResultType.Fail to Color.hex("#CA5100"),
+    ResultType.NotImplemented to Color.hex("#FFBA7A"),
+    ResultType.Timeout to Color.hex("#CFCFCF"),
+    ResultType.CrashMemory to Color.hex("#5F9ED1"),
+    ResultType.Unknown to Color.hex("#898989"),
+)
 
 fun createOverallResultPlot(jsonData: List<SuiteResults>): Plot {
     val resultValues = ResultType.entries
@@ -50,14 +62,7 @@ fun createOverallResultPlot(jsonData: List<SuiteResults>): Plot {
                 }
                 fillColor("result") {
                     legend.name = "Result"
-                    scale = categorical(
-                        ResultType.Pass to Color.GREEN,
-                        ResultType.Fail to Color.RED,
-                        ResultType.NotImplemented to Color.YELLOW,
-                        ResultType.Timeout to Color.PURPLE,
-                        ResultType.CrashMemory to Color.BLUE,
-                        ResultType.Unknown to Color.GREY
-                    )
+                    scale = createColorScale()
                 }
                 position = Position.stack()
             }
@@ -135,15 +140,7 @@ fun createSuiteResultsPlot(jsonData: List<SuiteResults>, summaries: DataFrame<Re
                     }
                     fillColor("result") {
                         legend.name = "Result"
-                        scale = categorical(
-                            ResultType.Pass to Color.GREEN,
-                            ResultType.Fail to Color.RED,
-                            ResultType.NotImplemented to Color.YELLOW,
-                            ResultType.Timeout to Color.PURPLE,
-                            ResultType.CrashMemory to Color.BLUE,
-                            ResultType.Unknown to Color.GREY
-                        )
-                    }
+                        scale = createColorScale()                    }
                     position = Position.stack()
                 }
             }
@@ -198,15 +195,7 @@ fun createDivergingSuiteResultsPlot(jsonData: List<SuiteResults>, summaries: Dat
                     }
                     fillColor("result") {
                         legend.name = "Result"
-                        scale = categorical(
-                            ResultType.Pass to Color.GREEN,
-                            ResultType.Fail to Color.RED,
-                            ResultType.NotImplemented to Color.YELLOW,
-                            ResultType.Timeout to Color.PURPLE,
-                            ResultType.CrashMemory to Color.BLUE,
-                            ResultType.Unknown to Color.GREY
-                        )
-                    }
+                        scale = createColorScale()                    }
                     position = Position.stack()
                 }
             }
