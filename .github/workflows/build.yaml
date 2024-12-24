@@ -109,7 +109,7 @@ jobs:
       - name: Download ety test results
         uses: actions/download-artifact@v4
         with:
-          name: test-report-ety
+          name: test-report-etylizer
           path: report-generator/results
       - name: Download gradualizer test results
         uses: actions/download-artifact@v4
