@@ -79,7 +79,7 @@ jobs:
         run: ./timeout -t 10 -m 2000000 echo OK
 
       - name: Execute Runner on test suites
-        run: ./testrunner -s etylizer-src,dialyzer-src,gradualizer-src,eqwalizer-src --analyzer ${{ matrix.analyzer }}
+        run: ./testrunner -s etylizer-src,dialyzer-src,gradualizer-src,eqwalizer-src --analyzer ${{ matrix.analyzer }} --debug
 
       - name: Rename output file
         run: mv test_results.json test_results_${{ matrix.analyzer }}.json
