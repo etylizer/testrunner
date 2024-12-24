@@ -78,6 +78,10 @@ jobs:
       - name: Print timeout info
         run: ./timeout -t 10 -m 2000000 echo OK
 
+      - name: Create _build directory for ety # Needed for bundled ety to work
+        if: ${{ matrix.analyzer == 'etylizer' }}
+        run: mkdir _build
+
       - name: Execute Runner on test suites
         run: ./testrunner -s etylizer-src,dialyzer-src,gradualizer-src,eqwalizer-src --analyzer ${{ matrix.analyzer }}
 
@@ -106,10 +110,10 @@ jobs:
         with:
           name: test-report-eqwalizer
           path: report-generator/results
-      - name: Download ety test results
+      - name: Download etylizer test results
         uses: actions/download-artifact@v4
         with:
-          name: test-report-ety
+          name: test-report-etylizer
           path: report-generator/results
       - name: Download gradualizer test results
         uses: actions/download-artifact@v4
