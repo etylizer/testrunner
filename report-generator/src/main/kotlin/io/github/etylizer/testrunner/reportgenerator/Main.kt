@@ -9,6 +9,8 @@ import org.jetbrains.kotlinx.dataframe.io.toCsv
 import org.jetbrains.kotlinx.dataframe.io.toStandaloneHTML
 import org.jetbrains.kotlinx.kandy.letsplot.export.save
 import java.io.File
+import kotlin.io.path.Path
+import kotlin.io.path.isDirectory
 
 val json = Json {
     ignoreUnknownKeys = true
@@ -20,7 +22,7 @@ fun main(args: Array<String>) {
     val outputDirectory = "report-output"
     File(outputDirectory).mkdirs()
 
-    val jsonData = json.decodeFromString<List<SuiteResults>>(File(resultsFileName).readText())
+    val jsonData = readResults(resultsFileName)
     val summaryDf = generateBasicDataframe(jsonData).also { summaryDf ->
         File("$outputDirectory/summary-df.csv").writeText(summaryDf.toCsv())
         summaryDf.toStandaloneHTML(DisplayConfiguration(rowsLimit = null, cellContentLimit = 512))
@@ -86,3 +88,15 @@ fun computeSuiteNames(jsonData: List<SuiteResults>) = jsonData.first().testSuite
     .map { it.suiteName }
     .map { it.split('-').firstOrNull() ?: it }
     .sorted()
+
+private fun readResults(path: String): List<SuiteResults> {
+    val file = File(path)
+    return if (file.isDirectory) {
+        println("Reading result files from directory")
+        val resultFiles = file.listFiles()!!.filter { it.isFile && it.extension == "json" }
+        resultFiles.flatMap { json.decodeFromString<List<SuiteResults>>(it.readText()) }
+    } else {
+        println("Reading combined results from single file")
+        json.decodeFromString<List<SuiteResults>>(file.readText())
+    }
+}

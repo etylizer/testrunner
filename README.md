@@ -100,6 +100,9 @@ There are multiple command line options to customize the behaviour of the test r
 - `--ety-dir <path>`: The path to the directory of an `ety` executable. Defaults to the current directory. **This option
   is required for some ety versions due to an issue in ety.**
 - `--debug`: Enables debug logging. Will print all outputs from the analyzer executions to the command line.
+- `--analyzer <analyzer>`: Allows to specify an individual analyzer to run. Only the specified type checker/analyzer 
+  will be executed in the test run. Valid values are `dialyzer`, `eqwalizer`, `etylizer` and `gradualizer`. Other values
+  including the empty string will result in all analyzers being executed.
 
 The timeout executable is used to limit both memory usage and runtime of the tested analyzer executables.
 

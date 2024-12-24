@@ -1,7 +1,7 @@
 defmodule TestRunner.Cli do
   def main(_args \\ []) do
     args = System.argv()
-    {test_suites, test_categories, options} = retrieve_cli_params(args)
+    {test_suites, test_categories, options, analyzer} = retrieve_cli_params(args)
     IO.puts("Using '#{options.timeout_executable}' as timeout executable.")
 
 #    test_mode = Map.get(named_opts, :test, false)
@@ -12,7 +12,7 @@ defmodule TestRunner.Cli do
 
     test_data = TestRunner.TestCollector.collect_tests(test_suites, test_categories)
 
-    executables = compute_executable_list()
+    executables = compute_executable_list(analyzer)
 
     test_results = Enum.map(executables, fn executable = {exec_type, _} ->
       IO.inspect({:executable, exec_type})
@@ -25,7 +25,7 @@ defmodule TestRunner.Cli do
   @spec retrieve_cli_params([String.t()]) :: {[String.t()], [String.t()], TestRunner.TestConfig.t()}
   defp retrieve_cli_params(args) do
     {named_opts_raw, _other_opts, _errors} = OptionParser.parse(args,
-      strict: [suites: :string, categories: :string, enable_parallelism: :boolean, timeout_executable: :string, test: :boolean, ety_dir: :string, debug: :boolean],
+      strict: [suites: :string, categories: :string, enable_parallelism: :boolean, timeout_executable: :string, test: :boolean, ety_dir: :string, debug: :boolean, analyzer: :string],
       aliases: [s: :suites, c: :categories, d: :enable_parallelism, t: :timeout_executable])
     named_opts = Map.new(named_opts_raw)
 
@@ -35,18 +35,26 @@ defmodule TestRunner.Cli do
     timeout_executable = Map.get(named_opts, :timeout_executable, Path.absname("./timeout"))
     ety_dir = Map.get(named_opts, :ety_dir, Path.absname("."))
     debug_mode = Map.get(named_opts, :debug, false)
+    analyzer = Map.get(named_opts, :analyzer, "")
 
-    {test_suites, test_categories, %TestRunner.TestConfig{timeout_executable: timeout_executable, enable_parallelism: enable_parallelism, ety_dir: ety_dir, debug_mode: debug_mode}}
+    {test_suites, test_categories, %TestRunner.TestConfig{timeout_executable: timeout_executable, enable_parallelism: enable_parallelism, ety_dir: ety_dir, debug_mode: debug_mode}, analyzer}
   end
 
-  @spec compute_executable_list() :: [{atom(), String.t()}]
-  defp compute_executable_list() do
-    [
-      {:dialyzer, "dialyzer"},
-      {:etylizer, "./ety"},
-      {:gradualizer, "./gradualizer"},
-      {:eqwalizer, "./elp"}
-    ]
+  @spec compute_executable_list(String.t()) :: [{atom(), String.t()}]
+  defp compute_executable_list(analyzer) do
+    case analyzer do
+      "dialyzer" -> [{:dialyzer, "dialyzer"}]
+      "etylizer" -> [{:etylizer, "./ety"}]
+      "gradualizer" -> [{:gradualizer, "./gradualizer"}]
+      "eqwalizer" -> [{:eqwalizer, "./elp"}]
+      _ ->
+        [
+          {:dialyzer, "dialyzer"},
+          {:etylizer, "./ety"},
+          {:gradualizer, "./gradualizer"},
+          {:eqwalizer, "./elp"}
+        ]
+     end
   end
 
   defp save_results(test_results) do
