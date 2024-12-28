@@ -9,17 +9,16 @@ import org.jetbrains.kotlinx.kandy.dsl.categorical
 import org.jetbrains.kotlinx.kandy.dsl.plot
 import org.jetbrains.kotlinx.kandy.ir.Plot
 import org.jetbrains.kotlinx.kandy.ir.bindings.NonPositionalMappingParameters
+import org.jetbrains.kotlinx.kandy.letsplot.export.save
 import org.jetbrains.kotlinx.kandy.letsplot.feature.Position
 import org.jetbrains.kotlinx.kandy.letsplot.feature.layout
 import org.jetbrains.kotlinx.kandy.letsplot.feature.position
 import org.jetbrains.kotlinx.kandy.letsplot.layers.bars
-import org.jetbrains.kotlinx.kandy.letsplot.layers.context.aes.WithFillColor
 import org.jetbrains.kotlinx.kandy.letsplot.layers.line
 import org.jetbrains.kotlinx.kandy.letsplot.multiplot.model.PlotGrid
 import org.jetbrains.kotlinx.kandy.letsplot.multiplot.plotGrid
 import org.jetbrains.kotlinx.kandy.letsplot.scales.continuousColorViridis
 import org.jetbrains.kotlinx.kandy.util.color.Color
-import org.jetbrains.kotlinx.kandy.util.color.StandardColor
 import java.util.*
 
 private fun DataFrame<ResultSummary>.findDivergingResults(includeDialyzer: Boolean = true) = filter {
@@ -44,9 +43,10 @@ fun createOverallResultPlot(jsonData: List<SuiteResults>): Plot {
         .map { entry ->
             entry.key to resultValues.map { resultValue -> resultValue to entry.value.count { it.result == resultValue } }
         }
+        .sortedBy { it.first }
 
     val resultData = mapOf(
-        "executable" to rawData.flatMap { pair -> List(pair.second.size) { pair.first } },
+        "executable" to rawData.flatMap { pair -> List(pair.second.size) { pair.first } }.map { fixExecutableName(it) },
         "result" to rawData.flatMap { it.second.map { it.first } },
         "amount" to rawData.flatMap { it.second.map { it.second } }
     )
@@ -111,7 +111,7 @@ fun createCategoryAverageTimePlot(jsonData: List<SuiteResults>): Plot {
 }
 
 fun createSuiteResultsPlot(jsonData: List<SuiteResults>, summaries: DataFrame<ResultSummary>): PlotGrid {
-    val testSuites = jsonData.first().testSuites.map { it.suiteName }.map { it.split('-').firstOrNull() ?: it }.sorted()
+    val testSuites = computeSuiteNames(jsonData)
     val resultValues = ResultType.entries
 
     val plots = mutableListOf<Plot>()
@@ -122,13 +122,17 @@ fun createSuiteResultsPlot(jsonData: List<SuiteResults>, summaries: DataFrame<Re
             .map { entry ->
                 entry.key to resultValues.map { resultValue -> resultValue to entry.value.count { it.result == resultValue } }
             }
+            .sortedBy { it.first }
         val resultData = mapOf(
-            "executable" to rawResultData.flatMap { pair -> List(pair.second.size) { pair.first } },
+            "executable" to rawResultData.flatMap { pair -> List(pair.second.size) { pair.first } }.map { fixExecutableName(it) },
             "result" to rawResultData.flatMap { it.second.map { it.first } },
             "amount" to rawResultData.flatMap { it.second.map { it.second } }
         )
 
+        val divergingCount = countDivergingResult(jsonData, summaries, testSuite)
         val totalResults = summaries.count { testfile.startsWith(testSuite) }
+        val divergingPercentage = String.format(Locale.ENGLISH, "%.2f", (divergingCount.toDouble() / totalResults) * 100)
+
         val suitePlot = plot(resultData) {
             groupBy("executable") {
                 bars {
@@ -145,15 +149,34 @@ fun createSuiteResultsPlot(jsonData: List<SuiteResults>, summaries: DataFrame<Re
                 }
             }
             layout {
-                title = "$testSuite tests"
-                subtitle = "$totalResults total"
+                title = "${fixExecutableName(testSuite)} tests"
+                subtitle = "$totalResults total, $divergingCount diverging ($divergingPercentage%)"
             }
         }
 
+        suitePlot.save("suite-results-$testSuite.png", scale = 2, path = "report-output", dpi = 300)
         plots.add(suitePlot)
     }
 
     return plotGrid(plots, 2)
+}
+
+private fun countDivergingResult(jsonData: List<SuiteResults>, summaries: DataFrame<ResultSummary>, testSuite: String): Int {
+    val resultValues = ResultType.entries
+    val divergingResults = summaries.findDivergingResults(true)
+    val suiteDivergingResults = divergingResults.filter { testfile.startsWith(testSuite) }.map { testfile }
+
+    val rawResultData = jsonData
+        .groupBy { it.executable }
+        .mapValues { executableResults ->
+            executableResults.value.flatMap { it.testSuites }.flatMap { it.categories }.flatMap { it.results }.filter { fileResult -> fileResult.file in suiteDivergingResults }
+        }
+        .map { entry ->
+            entry.key to resultValues.map { resultValue -> resultValue to entry.value.count { it.result == resultValue } }
+        }
+
+    val divergingResultsCount = rawResultData.first().second.sumOf { it.second }
+    return divergingResultsCount
 }
 
 fun createDivergingSuiteResultsPlot(jsonData: List<SuiteResults>, summaries: DataFrame<ResultSummary>, includeDialyzer: Boolean = true): PlotGrid {
@@ -173,9 +196,10 @@ fun createDivergingSuiteResultsPlot(jsonData: List<SuiteResults>, summaries: Dat
             .map { entry ->
                 entry.key to resultValues.map { resultValue -> resultValue to entry.value.count { it.result == resultValue } }
             }
+            .sortedBy { it.first }
 
         val divergingResultData = mapOf(
-            "executable" to rawResultData.flatMap { pair -> List(pair.second.size) { pair.first } },
+            "executable" to rawResultData.flatMap { pair -> List(pair.second.size) { pair.first } }.map { fixExecutableName(it) },
             "result" to rawResultData.flatMap { it.second.map { it.first } },
             "amount" to rawResultData.flatMap { it.second.map { it.second } }
         )
@@ -200,13 +224,26 @@ fun createDivergingSuiteResultsPlot(jsonData: List<SuiteResults>, summaries: Dat
                 }
             }
             layout {
-                title = "Diverging results ($testSuite tests)"
+                title = "Diverging results (${fixExecutableName(testSuite)} tests)"
                 subtitle = "$divergingResultsCount diverging, $totalResults total ($divergingPercentage%)"
             }
         }
+
+        val dialyzerInclusion = if (includeDialyzer) "" else "-no-dialyzer"
+        suitePlot.save("diverging-results$dialyzerInclusion-$testSuite.png", scale = 2, path = "report-output", dpi = 300)
 
         plots.add(suitePlot)
     }
 
     return plotGrid(plots, 2)
+}
+
+private fun fixExecutableName(testSuite: String): String {
+    when(testSuite.lowercase()) {
+        "dialyzer" -> return "Dialyzer"
+        "eqwalizer" -> return "eqWAlizer"
+        "etylizer" -> return "Etylizer"
+        "gradualizer" -> return "Gradualizer"
+        else -> return testSuite
+    }
 }
