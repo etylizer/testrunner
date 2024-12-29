@@ -147,9 +147,12 @@ jobs:
       - name: Run report generator
         run: ./gradlew run --args="results"
         working-directory: report-generator
+      - name: Create top-level output directory
+        run: mkdir output
+      - name: Move report output to top-level output directory
+        run: mv report-generator/report-output output/
       - name: Upload plots
         uses: actions/upload-artifact@v4
         with:
-          path: 'report-generator/report-output/'
+          path: 'output'
           name: 'report-output'
-          retention-days: 14
