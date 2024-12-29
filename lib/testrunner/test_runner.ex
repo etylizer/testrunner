@@ -121,7 +121,7 @@ defmodule TestRunner.Runner do
     case effective_exit_code do
       0 -> :pass
       1 -> :fail
-      2 -> :fail
+      2 -> :unknown
       5 -> :not_implemented
       124 -> :timeout
       137 -> :crash_memory
