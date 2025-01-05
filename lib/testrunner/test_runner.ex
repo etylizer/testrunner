@@ -108,6 +108,7 @@ defmodule TestRunner.Runner do
 
   @spec evaluate_raw_result(non_neg_integer(), String.t(), {atom(), String.t()}) :: test_result()
   defp evaluate_raw_result(exit_code, console_output, {executable_type, _}) do
+    # swap 1 and 2 for dialyzer since it uses 1 to indicate general errors (syntax, crash, etc.) and 2 for type warnings
     effective_exit_code = case executable_type do
       :dialyzer -> case exit_code do
                      1 -> 2

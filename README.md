@@ -106,6 +106,23 @@ There are multiple command line options to customize the behaviour of the test r
 
 The timeout executable is used to limit both memory usage and runtime of the tested analyzer executables.
 
+### Evaluation of test results
+
+By default, the test runner evaluates test results based on their exit code.
+There are multiple exit codes that are mapped to a certain result type.
+Result types `pass` and `fail` are swapped for tests that are meant to fail.
+
+- 0: Pass, no errors detected
+- 1: Fail, errors detected
+- 5: NotImplemented, specific to ety
+- 124: Timeout
+- 137: CrashMemory, the defined memory limit was exceeded
+- all other: Unknown, indicates some other problem that is not a type error, like syntax errors
+
+For dialyzer, exit codes 1 and 2 are swapped, meaning that 1 is considered as unknown error and 2 is considered as type 
+error and therefore `fail`. This is necessary because dialyzer uses exit code 1 to indicate general errors like syntax 
+errors, file not found errors, etc.
+
 ## Test Result Processing
 
 Test results can be processed into various plots and tables with the `report-generator` tool.
