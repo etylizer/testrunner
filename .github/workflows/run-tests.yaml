@@ -85,7 +85,7 @@ jobs:
 
       - name: Print etylizer info # has no version yet
         if: ${{ matrix.analyzer == 'etylizer' }}
-        run: ./ety || true
+        run: ./ety --help || true
 
       - name: Print eqWAlizer info
         if: ${{ matrix.analyzer == 'eqwalizer' }}
@@ -93,10 +93,6 @@ jobs:
 
       - name: Print timeout info
         run: ./timeout -t 10 -m 2000000 echo OK
-
-      - name: Create _build directory for ety # Needed for bundled ety to work
-        if: ${{ matrix.analyzer == 'etylizer' }}
-        run: mkdir _build
 
       - name: Execute Runner on test suites
         run: ./testrunner -s etylizer-src,dialyzer-src,gradualizer-src,eqwalizer-src --debug=${{ inputs.debug_mode }} --analyzer ${{ matrix.analyzer }}
