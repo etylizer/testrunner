@@ -25,7 +25,7 @@ defmodule TestRunner.Cli do
   @spec retrieve_cli_params([String.t()]) :: {[String.t()], [String.t()], TestRunner.TestConfig.t()}
   defp retrieve_cli_params(args) do
     {named_opts_raw, _other_opts, _errors} = OptionParser.parse(args,
-      strict: [suites: :string, categories: :string, enable_parallelism: :boolean, timeout_executable: :string, test: :boolean, ety_dir: :string, debug: :boolean, analyzer: :string],
+      strict: [suites: :string, categories: :string, enable_parallelism: :boolean, timeout_executable: :string, test: :boolean, etylizer_dir: :string, debug: :boolean, analyzer: :string],
       aliases: [s: :suites, c: :categories, d: :enable_parallelism, t: :timeout_executable])
     named_opts = Map.new(named_opts_raw)
 
@@ -33,24 +33,24 @@ defmodule TestRunner.Cli do
     test_categories = String.split(Map.get(named_opts, :categories, ""), ",", trim: true)
     enable_parallelism = Map.get(named_opts, :enable_parallelism, false)
     timeout_executable = Map.get(named_opts, :timeout_executable, Path.absname("./timeout"))
-    ety_dir = Map.get(named_opts, :ety_dir, Path.absname("."))
+    etylizer_dir = Map.get(named_opts, :etylizer_dir, Path.absname("."))
     debug_mode = Map.get(named_opts, :debug, false)
     analyzer = Map.get(named_opts, :analyzer, "")
 
-    {test_suites, test_categories, %TestRunner.TestConfig{timeout_executable: timeout_executable, enable_parallelism: enable_parallelism, ety_dir: ety_dir, debug_mode: debug_mode}, analyzer}
+    {test_suites, test_categories, %TestRunner.TestConfig{timeout_executable: timeout_executable, enable_parallelism: enable_parallelism, etylizer_dir: etylizer_dir, debug_mode: debug_mode}, analyzer}
   end
 
   @spec compute_executable_list(String.t()) :: [{atom(), String.t()}]
   defp compute_executable_list(analyzer) do
     case analyzer do
       "dialyzer" -> [{:dialyzer, "dialyzer"}]
-      "etylizer" -> [{:etylizer, "./ety"}]
+      "etylizer" -> [{:etylizer, "./etylizer"}]
       "gradualizer" -> [{:gradualizer, "./gradualizer"}]
       "eqwalizer" -> [{:eqwalizer, "./elp"}]
       _ ->
         [
           {:dialyzer, "dialyzer"},
-          {:etylizer, "./ety"},
+          {:etylizer, "./etylizer"},
           {:gradualizer, "./gradualizer"},
           {:eqwalizer, "./elp"}
         ]
